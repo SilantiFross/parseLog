@@ -3,8 +3,16 @@
 namespace parseLog;
 
 require_once 'DescriptionLog.php';
+require_once 'RootLog.php';
+require_once 'Node.php';
+require_once 'Prp.php';
+require_once 'ChildNode.php';
 
 use parseLog\classes\DescriptionLog as DescriptionLog;
+use parseLog\classes\Node;
+use parseLog\classes\RootLog as RootLog;
+use parseLog\classes\Prp as Prp;
+use parseLog\classes\ChildNode as ChildNode;
 
 class ResultTest
 {
@@ -14,7 +22,7 @@ class ResultTest
     public function __construct()
     {
         $this->descriptionLog = new DescriptionLog();
-        $this->rootLog = array();
+        $this->rootLog = new RootLog();
     }
 
     public function cleanDescriptionLog($log)
@@ -30,7 +38,29 @@ class ResultTest
         $this->descriptionLog->errorCount = (int)$this->getValue($log, "error count");
         $this->descriptionLog->executionTime = $this->getTime($this->getValue($log, "start time"), $this->getValue($log, "stop time"));
     }
-    
+
+    public function cleanRootLog($log)
+    {
+        foreach ($log as $item) {
+            $newNode = new Node($item['name'], $item[0]['name']);
+            foreach ($item[0] as $childNode) {
+                if (is_array($childNode) and array_key_exists('name', $childNode)) {
+                    $newChildPrp = new Prp($childNode['name']);
+                    $newChildPrp->{'value'} = $childNode['value'];
+                    array_push($newNode->childNode->childPrpArray, $newChildPrp);
+                }
+            }
+            foreach (array_slice($item, 2) as $prp) {
+                $newPrp = new Prp($prp['name']);
+                if (array_key_exists('value', $prp)) {
+                    $newPrp->{'value'} = $prp['value'];
+                }
+                array_push($newNode->prp_childs, $newPrp);
+            }
+            array_push($this->rootLog->nodes, $newNode);
+        }
+    }
+
     public function getTime($timeStart, $timeStop)
     {
         $timeStr = '0 min %s% sec';

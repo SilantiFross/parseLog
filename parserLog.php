@@ -18,6 +18,5 @@ $dataRootLog = $xmlParser->parseRootXml($rootXml);
 
 $resultTest = new ResultTest();
 $resultTest->cleanDescriptionLog($dataDescriptionLog);
-$resultTest->rootLog = $dataRootLog;
-
+$resultTest->cleanRootLog($dataRootLog);
 print_r($resultTest);
