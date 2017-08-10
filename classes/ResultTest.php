@@ -12,7 +12,6 @@ use parseLog\classes\DescriptionLog as DescriptionLog;
 use parseLog\classes\Node;
 use parseLog\classes\RootLog as RootLog;
 use parseLog\classes\Prp as Prp;
-use parseLog\classes\ChildNode as ChildNode;
 
 class ResultTest
 {
@@ -22,7 +21,6 @@ class ResultTest
     public function __construct()
     {
         $this->descriptionLog = new DescriptionLog();
-        $this->rootLog = new RootLog();
     }
 
     public function cleanDescriptionLog($log)
@@ -41,24 +39,7 @@ class ResultTest
 
     public function cleanRootLog($log)
     {
-        foreach ($log as $item) {
-            $newNode = new Node($item['name'], $item[0]['name']);
-            foreach ($item[0] as $childNode) {
-                if (is_array($childNode) and array_key_exists('name', $childNode)) {
-                    $newChildPrp = new Prp($childNode['name']);
-                    $newChildPrp->{'value'} = $childNode['value'];
-                    array_push($newNode->childNode->childPrpArray, $newChildPrp);
-                }
-            }
-            foreach (array_slice($item, 2) as $prp) {
-                $newPrp = new Prp($prp['name']);
-                if (array_key_exists('value', $prp)) {
-                    $newPrp->{'value'} = $prp['value'];
-                }
-                array_push($newNode->prp_childs, $newPrp);
-            }
-            array_push($this->rootLog->nodes, $newNode);
-        }
+        $this->rootLog = json_decode(json_encode($log), FALSE);
     }
 
     public function getTime($timeStart, $timeStop)
